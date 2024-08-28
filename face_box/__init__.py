@@ -17,10 +17,13 @@ def no_crop(im):
         exit()
 
 class retinaface:
-    def __init__(self, device):
+    def __init__(self, model_path=None):
+        if model_path is None:
+            model_path = 'assets/'
+
         # retinaface uses cuda
-        self.landmark_model = LargeModelInfer("assets/large_base_net.pth", device=device)
-        self.lm3d_std = load_lm3d()
+        self.landmark_model = LargeModelInfer(model_path+"/large_base_net.pth", device='cuda')
+        self.lm3d_std = load_lm3d(assets_path=model_path)
 
     def detector(self, im):
         img = cv2.cvtColor(np.asarray(im),cv2.COLOR_RGB2BGR)
@@ -40,13 +43,15 @@ class retinaface:
             return trans_params, im
 
         else:
-            print('no face detected! run original image')
+            #TODO: Handle these appropriately
+            #print('no face detected! run original image')
             if np.array(im).shape==(224,224,3):
                 im = torch.tensor(np.array(im)/255., dtype=torch.float32).permute(2, 0, 1).unsqueeze(0)
                 return None, im
             else:
-                print('exit. no face detected! run original image. the original face image should be well cropped and resized to (224,224,3).')
-                exit()
+                #print('exit. no face detected! run original image. the original face image should be well cropped and resized to (224,224,3).')
+                #exit()
+                return None, im
 
 class mtcnnface:
     def __init__(self):
@@ -92,14 +97,14 @@ class mtcnnface:
                 exit()
 
 class face_box:
-    def __init__(self, args):
+    def __init__(self, args, model_path=None):
         if args.iscrop:
             if args.detector == 'mtcnn':
-                m = mtcnnface()
+                m = mtcnnface(model_path)
                 self.detector = m.detector
                 print('use mtcnn for face box')
             elif args.detector == 'retinaface':
-                r = retinaface(args.device)
+                r = retinaface(model_path)
                 self.detector = r.detector
                 print('use retinaface for face box')
             else:

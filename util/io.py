@@ -6,7 +6,7 @@ import torch
 import numpy as np
 from PIL import Image
 # from .preprocess import back_resize_crop_img
-# from .nv_diffrast import MeshRenderer
+from .nv_diffrast import MeshRenderer
 
 def plot_kpts(image, kpts, color = 'g'):
 
@@ -177,7 +177,7 @@ class visualize:
         self.save_dict = {}
         self.args = args
 
-    def visualize_and_output(self, trans_params, img, save_path, img_name):
+    def visualize_and_output(self, trans_params, img, img_name, save_path=None):
         # assert batch_size = 1
         self.visualize_dict.append(img)
 
@@ -265,14 +265,16 @@ class visualize:
         if self.args.extractTex:
             v3d_new = self.result_dict['v3d'][0].copy()
             v3d_new[..., -1] = 10 - v3d_new[..., -1]
-            write_obj_with_colors(os.path.join(save_path, img_name + '_extractTex.obj'), v3d_new, self.result_dict['tri'], self.result_dict['extractTex'])
+            if(save_path != None):
+                write_obj_with_colors(os.path.join(save_path, img_name + '_extractTex.obj'), v3d_new, self.result_dict['tri'], self.result_dict['extractTex'])
             # cv2.imwrite(os.path.join(save_path, img_name + '_extractTex_uv.png'), (self.result_dict['extractTex_uv']*255).astype(np.uint8)[:,:,::-1])
 
         # please note that the coordinates of .obj do not account for the trans_params.
         if self.args.useTex:
             v3d_new = self.result_dict['v3d'][0].copy()
             v3d_new[..., -1] = 10 - v3d_new[..., -1]
-            write_obj_with_colors(os.path.join(save_path, img_name + '_pcaTex.obj'), v3d_new, self.result_dict['tri'], self.result_dict['face_texture'][0])
+            if(save_path != None):
+                write_obj_with_colors(os.path.join(save_path, img_name + '_pcaTex.obj'), v3d_new, self.result_dict['tri'], self.result_dict['face_texture'][0])
 
         len_visualize_dict = len(self.visualize_dict)
         if len(self.visualize_dict) < 4:
@@ -288,8 +290,9 @@ class visualize:
             y_end = y_start + img.shape[0]
             img_res[y_start:y_end, x_start:x_end] = image
 
-        cv2.imwrite(os.path.join(save_path, img_name + '.png'), img_res)
-        np.save(os.path.join(save_path, img_name + '.npy'), self.save_dict)
+        if save_path != None:
+            cv2.imwrite(os.path.join(save_path, img_name + '.png'), img_res)
+            np.save(os.path.join(save_path, img_name + '.npy'), self.save_dict)
 
 
 

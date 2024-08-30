@@ -4,3 +4,5 @@ recording*
 
 # repositories
 nvdiffrast
+
+util/__pycache__/*

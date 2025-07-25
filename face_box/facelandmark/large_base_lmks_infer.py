@@ -17,9 +17,9 @@ class LargeBaseLmkInfer:
 
         checkpoint = []
         if use_gpu:
-            checkpoint = torch.load(model_path, map_location='cuda')
+            checkpoint = torch.load(model_path, map_location='cuda', weights_only=False)
         else:
-            checkpoint = torch.load(model_path, map_location='cpu')
+            checkpoint = torch.load(model_path, map_location='cpu', weights_only=False)
 
         model.load_state_dict({k.replace('module.', ''): v for k, v in checkpoint['state_dict'].items()}, strict=False)
         model.eval()

@@ -6,3 +6,4 @@ recording*
 nvdiffrast
 
 **/__pycache__/
+*.pyc
